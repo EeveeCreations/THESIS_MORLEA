@@ -2,8 +2,7 @@ import gymnasium
 from gymnasium import spaces
 import numpy as np
 from pymoo.optimize import minimize
-
-from OLD.MOEA_RL import algorithm
+from pymoo.indicators.hv import HV
 
 MUTATION = [0.01,0.1,0.3]
 CROSSOVER = [0.6,0.8,0.9]
@@ -31,16 +30,16 @@ class EAEnv(gymnasium.Env):
         next_state = self.observation_space.sample(action)
         mutation, crossover = ACTION_SPACE[action]
         result = minimize(self.problem,self.algorithem, ('n_gen',1), seed=1)
-        hyper_vol = compute_hypervolume(result.F)
+        hyper_vol = HV(result.F)
         # diversity = 0  # Diversiity will be measure ocne we  have  tevrythign else goign too
         progress = self.step_count / self.max_steps
-
-        self.state = np.array([progress, improvement], dtype=np.float32)
 
         # SImply look if the  hv
         improvement = hyper_vol - self.prev_hyper_vol #Reward
         self.prev_hyper_vol = hyper_vol
         self.step_count += 1
+
+        self.state = np.array([progress, improvement], dtype=np.float32)
 
         terminated = False
         truncated = self.step_count >= self.max_steps

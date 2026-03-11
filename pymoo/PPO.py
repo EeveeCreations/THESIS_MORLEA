@@ -6,6 +6,7 @@ import numpy as np
 from AC import ActorCritic
 from neural_network import *
 from ea_environment import *
+from MOEA_RL import USED_PROBLEM, USED_ALGORITHEM
 
 ###### MODIFYIANBLE   PARAMTERS PPO ##############################
 
@@ -15,9 +16,8 @@ CLIP= 2e-2
 LEARNING_RATE= 2e-4
 EPOCHS = 10
 
-class PPO(AC):
+class PPO(ActorCritic):
     def __init__(self, state_dim, action_dim):
-
         self.gamma = GAMMA
         self.lam = LAMBDA
         self.clip_eps = CLIP
@@ -71,10 +71,7 @@ class PPO(AC):
 
 
 ### TRain loop
-def train():
-
-    env = EAEnv
-
+def train(env):
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
 
@@ -125,4 +122,5 @@ def train():
 
 
 if __name__ == "__main__":
-    train()
+    env = EAEnv(USED_ALGORITHEM, USED_PROBLEM)
+    train(env)

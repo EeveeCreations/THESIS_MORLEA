@@ -8,11 +8,15 @@ from pymoo.problems import get_problem
 from pymoo.optimize import minimize
 from pymoo.termination import get_termination
 
-############ Basic  Soltion functio
+
+####### Import the diffrent partiesss
+# from qtable import q_learning cn
+
+############ Basic  Soltion functiom
 
 
 ### Main   Dynamic Parameters N#############################################################################
-USED_PROBLEM="zdt1"
+USED_PROBLEM_NAME= "zdt1"
 
 ### EVO ALGO NSGAII ##################
 crossover_probability = 0.9
@@ -21,29 +25,37 @@ max_generations =200
 
 #### Parameters RL ####################
 rl_gamma = 0.99
-rl_lr =  0.001
-
+rl_lr =  1e-3
+rl_epsilon =0.01
 ##### Q-Table
+qt_episodes=500
 
 #####  PPO
+#
+# GAMMA = 0.99
+# LAMBDA= 0.95
+# CLIP= 2e-2
+# LEARNING_RATE= 2e-4
+# EPOCHS = 10
 
 
-
-
-problem = get_problem(USED_PROBLEM)
-algorithm = NSGA2(
+### PROBLEM  / ALGORITHEM USED
+USED_PROBLEM = get_problem(USED_PROBLEM_NAME)
+USED_ALGORITHEM = NSGA2(
     crossover=SBX(eta=15, prob=crossover_probability),
     mutation=PM(eta=20, prob=mutation_probability),
     pop_size=1000
 )
 
+
+
+
+###################### SINGLE USE FUNCTIONS NOT  USD  FOR  OPTIMIZTING OR  ACTUAL THESIS  RESERACH
 termination = get_termination("n_gen", max_generations)
-
-
 ### Optimize
 results = minimize(
-    problem,
-    algorithm,
+    USED_PROBLEM,
+    USED_ALGORITHEM,
     termination,
     seed=1,
     verbose=True
@@ -57,7 +69,7 @@ print("Number of Pareto solutions found:", len(F))
 
 
 
-pf = problem.pareto_front()
+pf = USED_PROBLEM.pareto_front()
 
 def plot_pareto_front(ea_algo, rl_algo, problem_name, pareto_front):
     plt.figure()
@@ -71,4 +83,4 @@ def plot_pareto_front(ea_algo, rl_algo, problem_name, pareto_front):
     plt.show()
 
 
-plot_pareto_front("NSGAII","", USED_PROBLEM, pf)
+plot_pareto_front("NSGAII","", USED_PROBLEM_NAME, pf)

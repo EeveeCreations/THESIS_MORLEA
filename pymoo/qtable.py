@@ -1,10 +1,8 @@
 from datetime import datetime
-
+from MOEA_RL import USED_PROBLEM, USED_ALGORITHEM
 import numpy as np
 import random
 import sys
-
-from dateutil.utils import today
 
 from ea_environment import EAEnv
 
@@ -49,7 +47,8 @@ def q_learning(env, episodes=500, alpha=0.1, gamma=0.99, epsilon=0.1):
 
 
 ### TO CHEC IF IT WORKS TO BE REMOVED
-env = EAEnv()
+
+env = EAEnv(USED_ALGORITHEM, USED_PROBLEM)
 Q = q_learning(env)
 sys.stdout = open("output-PArams"+ datetime.today()+".txt", "w")
 print("Learned Q-table:")
