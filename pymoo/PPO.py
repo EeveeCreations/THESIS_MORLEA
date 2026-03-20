@@ -4,9 +4,9 @@ import torch.nn.functional as F
 import gymnasium as gym
 import numpy as np
 from AC import ActorCritic
-from neural_network import *
+from actorcritic import *
 from ea_environment import *
-from MOEA_RL import USED_PROBLEM, USED_ALGORITHEM
+from MOEA_RL import USED_PROBLEM, USED_ALGORITHM
 
 ###### MODIFYIANBLE   PARAMTERS PPO ##############################
 
@@ -18,6 +18,7 @@ EPOCHS = 10
 
 class PPO(ActorCritic):
     def __init__(self, state_dim, action_dim):
+        super().__init__(state_dim, action_dim)
         self.gamma = GAMMA
         self.lam = LAMBDA
         self.clip_eps = CLIP
@@ -73,15 +74,15 @@ class PPO(ActorCritic):
 ### TRain loop
 def train(env):
     state_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.n
+    action_dim = env.action_space.shape[0]
 
     agent = PPO(state_dim, action_dim)
 
-    max_episodes = 500
+    max_episodes = 200
 
     for episode in range(max_episodes):
 
-        state, _ = env.reset()
+        state,_ = env.reset() # Might add info later
 
         states = []
         actions = []
@@ -93,11 +94,11 @@ def train(env):
         done = False
 
         while not done:
-
+            print(state)
             state_tensor = torch.FloatTensor(state)
             action, log_prob, value = agent.model.act(state_tensor)
 
-            next_state, reward, terminated, truncated, _ = env.step(action.item())
+            next_state, reward, terminated, truncated = env.step(action.item())
             done = terminated or truncated
 
             states.append(state)
@@ -122,5 +123,5 @@ def train(env):
 
 
 if __name__ == "__main__":
-    env = EAEnv(USED_ALGORITHEM, USED_PROBLEM)
+    env = EAEnv(USED_ALGORITHM, USED_PROBLEM)
     train(env)
