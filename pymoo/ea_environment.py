@@ -11,9 +11,9 @@ from pymoo.operators.mutation.pm import PM
 
 MUTATION = [0.01,0.1,0.3]
 CROSSOVER = [0.6,0.8,0.9]
-
+SEED = 420
 ACTION_SPACE = [ (m,c) for m in MUTATION for c in CROSSOVER]
-
+REWARD = 0.5
 N_ACTIONS = len(ACTION_SPACE)
 
 
@@ -38,6 +38,7 @@ class EAEnv(gymnasium.Env):
         self.algorithm.mating.mutation.prob = mutation
         self.algorithm.mating.crossover.prob = crossover
         self.algorithm.next()
+        self.seed =SEED
         NEXT_GEN = self.algorithm.pop
         NEXT_F = NEXT_GEN.get("F")
 
@@ -46,8 +47,8 @@ class EAEnv(gymnasium.Env):
         progress = self.step_count / self.max_steps
 
         # SImply look if the  hv has improved
-        print(hyper_vol)
-        improvement = (hyper_vol - self.prev_hyper_vol)  *1000#Reward
+        # print(hyper_vol)
+        improvement = np.abs(hyper_vol - self.prev_hyper_vol)/self.prev_hyper_vol# * REWARD#Reward
         self.prev_hyper_vol = hyper_vol
         self.step_count += 1
 
@@ -58,7 +59,14 @@ class EAEnv(gymnasium.Env):
 
         return self.state, improvement, terminated, truncated #  infor will ebadded  later, {}
 
-    def reset(self):
+    def reset(self, **kwargs):
+        self.algorithm.setup(self.problem)
+        self.algorithm.next()  # get first population
+
+        F = self.algorithm.pop.get("F")
+        self.prev_hyper_vol = HV(ref_point=np.array([1.1, 1.1])).do(F)
+
         self.step_count = 0
         self.state = np.zeros(3)
+
         return self.state, {} # migjt be abl to a dd some info if needed later on

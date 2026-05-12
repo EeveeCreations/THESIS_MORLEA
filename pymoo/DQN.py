@@ -68,7 +68,7 @@ env = EAEnv(USED_PROBLEM, USED_ALGORITHM)
 
 n_actions = ACTION_SPACE.__len__()
 # Get the number of state observations
-state, info = env.reset() #
+state, info = env.reset()  #
 n_observations = len(state)
 
 policy_net = DQNNetwork(n_observations, n_actions)

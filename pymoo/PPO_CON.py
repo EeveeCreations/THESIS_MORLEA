@@ -1,19 +1,18 @@
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
-import gymnasium as gym
-import numpy as np
+from jinja2.lexer import float_re
 from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.pm import PM
 from pymoo.problems import get_problem
+from torch.distributions import Normal
 
-from AC import ActorCritic
-from actorcritic import *
-from ea_environment import *
-# from pymoo.continues.parameters.MOEA_RL import USED_PROBLEM_NAME, crossover_probability, mutation_probability, USED_SEED
+from ACTOR_CRIT_CON import ActorCritic
+# from MOEA_RL import USED_PROBLEM, USED_ALGORITHM
 
-# from continues.paramters.MOEA_RL import USED_PROBLEM, USED_ALGORITHM
-### PROBLEM  / ALGORITHEM USED
-# ic  Soltion functiom
+from EA_ENV_CON import EAEnv
+from pymoo import ACTOR_CRIT_CON
 
 USED_SEED = 42
 ### Main   Dynamic Parameters N#############################################################################
@@ -32,13 +31,7 @@ USED_ALGORITHM = NSGA2(
 )
 USED_ALGORITHM.setup(USED_PROBLEM, seed=USED_SEED)
 
-
-
-
-
-
 ###### MODIFYIANBLE   PARAMTERS PPO ##############################
-
 GAMMA = 0.99
 LAMBDA= 0.95
 CLIP= 0.3
@@ -46,21 +39,31 @@ LEARNING_RATE= 2e-5
 EPOCHS = 10
 ENTHROPHY_COUNT = 0.1
 ACTOR_LOSS = 0.8
+MODEL = ActorCritic
+OPTIMIZER= optim.Adam
 
-
-class PPO(ActorCritic):
+class PPO:
     def __init__(self, state_dim, action_dim):
-        super().__init__(state_dim, action_dim)
         self.gamma = GAMMA
         self.lam = LAMBDA
         self.clip_eps = CLIP
-        self.lr = LEARNING_RATE
         self.epochs = EPOCHS
-        self.entropy_count = ENTHROPHY_COUNT
-        self.actor_loss = ACTOR_LOSS
+        self.lr = LEARNING_RATE
 
-        self.model = ActorCritic(state_dim, action_dim)
-        self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        self.model = MODEL(state_dim, action_dim)
+        self.optimizer = OPTIMIZER(self.model.parameters(), lr=self.lr)
+
+    def act(self, state):
+        state = torch.FloatTensor(state)
+
+        mu, std, value = self.model(state)
+
+        dist = Normal(mu, std)
+        action = dist.sample()
+
+        log_prob = dist.log_prob(action).sum(dim=-1)
+
+        return action.detach().numpy(), log_prob.detach(), value.detach()
 
     def compute_gae(self, rewards, values, dones):
         advantages = []
@@ -68,27 +71,28 @@ class PPO(ActorCritic):
         values = values + [0]
 
         for t in reversed(range(len(rewards))):
-            delta = rewards[t] + self.gamma * values[t+1] * (1-dones[t]) - values[t]
-            gae = delta + self.gamma * self.lam * (1-dones[t]) * gae
+            delta = rewards[t] + self.gamma * values[t+1] * (1 - dones[t]) - values[t]
+            gae = delta + self.gamma * self.lam * (1 - dones[t]) * gae
             advantages.insert(0, gae)
 
         return advantages
 
-    def update(self, states, actions, log_probs_old, returns, advantages):
-
+    def update(self, states, actions, old_log_probs, returns, advantages):
+        print( type(states), type(actions), type(old_log_probs), type(returns), type(advantages))
         states = torch.FloatTensor(states)
-        actions = torch.LongTensor(actions)
-        log_probs_old = torch.FloatTensor(log_probs_old)
+        actions = torch.FloatTensor(actions)
+        old_log_probs = torch.FloatTensor(old_log_probs)
         returns = torch.FloatTensor(returns)
         advantages = torch.FloatTensor(advantages)
 
         for _ in range(self.epochs):
 
-            logits, values = self.model(states)
-            dist = Categorical(logits=logits)
-            log_probs = dist.log_prob(actions)
+            mu, std, values = self.model(states)
 
-            ratio = torch.exp(log_probs - log_probs_old)
+            dist = Normal(mu, std)
+            log_probs = dist.log_prob(actions).sum(dim=-1)
+
+            ratio = torch.exp(log_probs - old_log_probs)
 
             surr1 = ratio * advantages
             surr2 = torch.clamp(ratio, 1 - self.clip_eps, 1 + self.clip_eps) * advantages
@@ -96,23 +100,22 @@ class PPO(ActorCritic):
             actor_loss = -torch.min(surr1, surr2).mean()
             critic_loss = F.mse_loss(values.squeeze(), returns)
 
-            entropy = dist.entropy().mean()
-            #0,5 =   somethign    self.gamma was 0.1
-            loss = actor_loss + self.actor_loss * critic_loss - self.entropy_count * entropy
+            loss = actor_loss + 0.5 * critic_loss
 
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
 
 
-### TRain loop
+
+    ### TRain loop
 def train(env):
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.shape[0]
 
     agent = PPO(state_dim, action_dim)
 
-    max_episodes = 200
+    max_episodes = 10
 
     for episode in range(max_episodes):
 
@@ -130,15 +133,15 @@ def train(env):
         while not done:
             print(state)
             state_tensor = torch.FloatTensor(state)
-            action, log_prob, value = agent.model.act(state_tensor)
+            action, log_prob, value = agent.act(state_tensor) # Model.act or   ppo.act
 
-            next_state, reward, terminated, truncated = env.step(action.item())
+            next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
 
-            states.append(state)
-            actions.append(action.item())
+            states.append(state.copy())
+            actions.append(action)
             rewards.append(reward)
-            log_probs.append(log_prob.item())
+            log_probs.append(log_prob)
             values.append(value.item())
             dones.append(done)
 
