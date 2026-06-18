@@ -25,7 +25,7 @@ class EAEnv(gymnasium.Env):
 
         self.state = np.zeros(3, dtype=np.float32)
         self.prev_hv = 0.0
-        self.max_steps = 50
+        self.max_steps = 50 # MAX STEPS   PER EPISODE  MAybe find it to be vribale  epsilon close
         self.step_count = 0
 
     def step(self, action):

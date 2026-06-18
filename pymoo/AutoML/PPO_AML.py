@@ -2,7 +2,6 @@ import numpy as np
 import torch.optim as optim
 
 import importlib
-PPO = importlib.import_module("pymoo.PPO_CON")
 
 
 PPO_SEARCH_SPACE = {
@@ -57,9 +56,3 @@ def sample_ppo_config():
 
 
 config = sample_ppo_config()
-
-agent = PPO(
-    state_dim,
-    action_dim,
-    config
-)

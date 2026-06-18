@@ -1,3 +1,8 @@
+import os
+import time
+from datetime import datetime
+
+import numpy as np
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
@@ -7,21 +12,21 @@ from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.problems import get_problem
 from torch.distributions import Normal
+from torch.utils.tensorboard import SummaryWriter
 
 from ACTOR_CRIT_CON import ActorCritic
 # from MOEA_RL import USED_PROBLEM, USED_ALGORITHM
 
 from EA_ENV_CON import EAEnv
-from pymoo import ACTOR_CRIT_CON
 
 USED_SEED = 42
 ### Main   Dynamic Parameters N#############################################################################
 USED_PROBLEM_NAME= "zdt4"
 
 ### EVO ALGO NSGAII ##################
-crossover_probability = 0.9
-mutation_probability = 0.9
-max_generations =20
+crossover_probability = 0.7 #(0,1.0)
+mutation_probability = 0.02 #(0, 1.0)
+max_generations = 20
 
 USED_PROBLEM = get_problem(USED_PROBLEM_NAME)
 USED_ALGORITHM = NSGA2(
@@ -32,11 +37,11 @@ USED_ALGORITHM = NSGA2(
 USED_ALGORITHM.setup(USED_PROBLEM, seed=USED_SEED)
 
 ###### MODIFYIANBLE   PARAMTERS PPO ##############################
-GAMMA = 0.99
-LAMBDA= 0.95
-CLIP= 0.3
-LEARNING_RATE= 2e-5
-EPOCHS = 10
+GAMMA = 0.97
+LAMBDA= 0.98
+CLIP= 0.005
+LEARNING_RATE= 2e-4
+EPOCHS = 20
 ENTHROPHY_COUNT = 0.1
 ACTOR_LOSS = 0.8
 MODEL = ActorCritic
@@ -79,8 +84,8 @@ class PPO:
 
     def update(self, states, actions, old_log_probs, returns, advantages):
         print( type(states), type(actions), type(old_log_probs), type(returns), type(advantages))
-        states = torch.FloatTensor(states)
-        actions = torch.FloatTensor(actions)
+        states = torch.FloatTensor(np.array(states))
+        actions = torch.FloatTensor(np.array(actions))
         old_log_probs = torch.FloatTensor(old_log_probs)
         returns = torch.FloatTensor(returns)
         advantages = torch.FloatTensor(advantages)
@@ -115,7 +120,7 @@ def train(env):
 
     agent = PPO(state_dim, action_dim)
 
-    max_episodes = 10
+    max_episodes = 20
 
     for episode in range(max_episodes):
 
@@ -153,12 +158,56 @@ def train(env):
         agent.update(states, actions, log_probs, returns, advantages)
 
         total_reward = sum(rewards)
+        ## SAFE TO   CSV
+        writer.add_scalar(
+            "Reward/TotalReward",
+            total_reward,
+            episode
+        )
+
+        writer.add_scalar(
+            "Advantage/Mean",
+            np.mean(advantages),
+            episode
+        )
+
+        writer.add_scalar(
+            "Return/Mean",
+            np.mean(returns),
+            episode
+        )
+        # with open(csv_file, "a", newline="") as f:
+        #     writer = csv.writer(f)
+        #     writer.writerow([
+        #         episode,
+        #         total_reward,
+        #         np.mean(advantages),
+        #         np.mean(returns)
+        #     ])
+
 
         print(f"Episode {episode} | Reward: {total_reward}")
 
     env.close()
+    return agent
 
 
 if __name__ == "__main__":
+    ######## Save the   ALgorithem
+    writer = SummaryWriter(log_dir="runs/"+USED_PROBLEM+"/"+datetime.now("%x"))
+    #
+    # csv_file = "training_log.csv"
+    #
+    # with open(csv_file, "w", newline="") as f:
+    #     writer = csv.writer(f)
+    #     writer.writerow([
+    #         "episode",
+    #         "total_reward",
+    #         "avg_advantage",
+    #         "avg_return"
+    #     ])
+
     env = EAEnv(USED_ALGORITHM, USED_PROBLEM)
-    train(env)
+    agent = train(env)
+    torch.save(agent.model.state_dict(), "ppo_final_model"+USED_PROBLEM+".pth")
+    print("ppo_final_model"+USED_PROBLEM+".pth")

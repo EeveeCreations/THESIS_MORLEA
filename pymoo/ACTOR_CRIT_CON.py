@@ -3,18 +3,24 @@ import torch.nn as nn
 from torch.distributions import Normal
 import torch.nn.functional as F
 
+LAYERS_NN = 4
+ACTIVATION_F_NN = nn.ReLU
+FILTERS_IN_NN = 128
+FILTERS_OUT_NN = 128
+FILTERS_MID_NN = 128
+
 class ActorCritic(nn.Module):
     def __init__(self, state_dim, action_dim):
         super().__init__()
 
         self.shared = nn.Sequential(
-            nn.Linear(state_dim, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
+            nn.Linear(state_dim, FILTERS_OUT_NN),
+            ACTIVATION_F_NN(),
+            nn.Linear(FILTERS_IN_NN, FILTERS_OUT_NN),
+            ACTIVATION_F_NN(),
         )
 
-        self.mu = nn.Linear(128, action_dim)
+        self.mu = nn.Linear(FILTERS_IN_NN, action_dim)
         self.log_std = nn.Parameter(torch.zeros(action_dim))
 
         self.value = nn.Linear(128, 1)
