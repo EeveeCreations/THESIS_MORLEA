@@ -1,10 +1,9 @@
 import gymnasium
 from gymnasium import spaces
 import numpy as np
+from MOEA_RL import REWARD_SCALE, REF_POINT
 from pymoo.indicators.hv import HV
 
-REWARD_SCALE = 0.5
-SEED = 420
 
 class EAEnv(gymnasium.Env):
     def __init__(self, algorithm, problem):
@@ -39,7 +38,7 @@ class EAEnv(gymnasium.Env):
         self.algorithm.next()
 
         F = self.algorithm.pop.get("F")
-        hv = HV(ref_point=np.array([1.1, 1.1]))(F)
+        hv = HV(ref_point=REF_POINT)(F)
 
         improvement = (hv - self.prev_hv) * REWARD_SCALE
         self.prev_hv = hv
@@ -61,7 +60,7 @@ class EAEnv(gymnasium.Env):
         self.algorithm.next()
 
         F = self.algorithm.pop.get("F")
-        self.prev_hv = HV(ref_point=np.array([1.1, 1.1]))(F)
+        self.prev_hv = HV(ref_point=REF_POINT)(F)
 
         self.step_count = 0
         self.state = np.zeros(3, dtype=np.float32)

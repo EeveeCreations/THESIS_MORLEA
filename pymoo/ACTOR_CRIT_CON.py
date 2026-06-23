@@ -1,8 +1,11 @@
 import torch
 import torch.nn as nn
 from torch.distributions import Normal
-import torch.nn.functional as F
 
+
+
+
+###### BASE NON CHANGING  PARAMTERS ##############################
 LAYERS_NN = 4
 ACTIVATION_F_NN = nn.ReLU
 FILTERS_IN_NN = 128

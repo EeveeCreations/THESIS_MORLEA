@@ -1,56 +1,63 @@
-from multiprocessing.spawn import set_executable
-
-import  pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.problems import get_problem
-from pymoo.optimize import minimize
-from pymoo.termination import get_termination
 
+import numpy as np
+from torch import optim
 
-####### Import the diffrent partiesss
-# from qtable import q_learning cn
+from ACTOR_CRIT_CON import ActorCritic
+
 
 ############ Basic  Soltion functiom
-
 USED_SEED = 42
 ### Main   Dynamic Parameters N#############################################################################
 USED_PROBLEM_NAME= "zdt1"
 
 ### EVO ALGO NSGAII ##################
-crossover_probability = 0.9
-mutation_probability = 0.9
-max_generations =200
+CROSSOVER_PROBABILITY = 0.9
+MUTATION_PROBABILITY = 0.9
 
-#### Parameters RL ####################
-rl_gamma = 0.99
-rl_lr =  1e-3
-rl_epsilon =0.01
+ETA_CROSSOVER = 15
+ETA_MUTATION = 20
+
+MAX_GENERATIONS=200
+POP_SIZE =1000
+
+
+#HYPER VOLUME REFRENCE POINT###############################################################
+REF_POINT = np.array([1.1, 1.1])
+
+
+#######ENVIRONMENT PARAMTERS  ###########################################################
+REWARD_SCALE = 0.5
+
+#### Parameters RL #######################################################################
+RL_GAMMA = 0.99
+RL_LR =  1e-3
+RL_EPSILON =0.01
 ##### Q-Table
-qt_episodes=500
+QT_EPISODES=500
 
-#####  PPO
-#
-GAMMA = 0.99
-LAMBDA= 0.95
-CLIP= 2e-2
+
+###### MODIFYIANBLE   PARAMTERS PPO ##############################
+GAMMA = 0.97
+LAMBDA= 0.98
+CLIP= 0.005
 LEARNING_RATE= 2e-4
-EPOCHS = 10
-
+EPOCHS = 20
+ENTHROPHY_COUNT = 0.1
+ACTOR_LOSS = 0.8
+MODEL = ActorCritic
+OPTIMIZER= optim.Adam
 
 ### PROBLEM  / ALGORITHEM USED
 USED_PROBLEM = get_problem(USED_PROBLEM_NAME)
 USED_ALGORITHM = NSGA2(
-    crossover=SBX(eta=15, prob=crossover_probability),
-    mutation=PM(eta=20, prob=mutation_probability),
-    pop_size=1000
-)
+    crossover=SBX(eta=ETA_CROSSOVER, prob=CROSSOVER_PROBABILITY),
+    mutation=PM(eta=ETA_MUTATION, prob=MUTATION_PROBABILITY),
+    pop_size=POP_SIZE)
 USED_ALGORITHM.setup(USED_PROBLEM, seed=USED_SEED)
-
-
 
 
 ###################### SINGLE USE FUNCTIONS NOT  USD  FOR  OPTIMIZTING OR  ACTUAL THESIS  RESERACH
