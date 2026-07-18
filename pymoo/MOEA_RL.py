@@ -39,8 +39,6 @@ RL_EPSILON =0.01
 ##### Q-Table
 QT_EPISODES=500
 
-
-###### MODIFYIANBLE   PARAMTERS PPO ##############################
 GAMMA = 0.97
 LAMBDA= 0.98
 CLIP= 0.005
