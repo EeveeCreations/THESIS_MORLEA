@@ -160,5 +160,5 @@ if __name__ == "__main__":
 
     env = EAEnv(USED_ALGORITHM, USED_PROBLEM)
     agent = train(env)
-    torch.save(agent.model.state_dict(), "ppo_final_model"+USED_PROBLEM+".pth")
-    print("ppo_final_model"+USED_PROBLEM+".pth")
+    torch.save(agent.model.state_dict(), "ppo_final_model"+USED_PROBLEM_NAME+".pth")
+    print("ppo_final_model"+USED_PROBLEM_NAME+".pth")

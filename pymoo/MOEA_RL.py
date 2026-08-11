@@ -12,7 +12,7 @@ from ACTOR_CRIT_CON import ActorCritic
 ############ Basic  Soltion functiom
 USED_SEED = 42
 ### Main   Dynamic Parameters N#############################################################################
-USED_PROBLEM_NAME= "zdt1"
+USED_PROBLEM_NAME= "zdt4"
 
 ### EVO ALGO NSGAII ##################
 CROSSOVER_PROBABILITY = 0.9
