@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 from MOEA_RL import (USED_PROBLEM, USED_ALGORITHM,
                      GAMMA, LAMBDA, CLIP, EPOCHS,
                      LEARNING_RATE, MODEL, OPTIMIZER,
-                     USED_PROBLEM_NAME)
+                     USED_PROBLEM_NAME, FINAL_RUNN_NAME)
 
 from EA_ENV_CON import EAEnv
 
@@ -144,6 +144,19 @@ def train(env):
             episode
         )
 
+        writer.add_scalar(
+            "Values/Mean",
+            np.mean(values),
+            episode
+        )
+
+        writer.add_scalar(
+            "Return/Mean",
+            np.mean(returns),
+            episode
+        )
+
+
         print(f"Episode {episode} | Reward: {total_reward}")
 
     env.close()
@@ -158,7 +171,7 @@ if __name__ == "__main__":
     os.makedirs(mapping, exist_ok=True)
     writer = SummaryWriter(log_dir=mapping+"/"+date_safer)#
 
-    env = EAEnv(USED_ALGORITHM, USED_PROBLEM)
+    env = EAEnv(USED_ALGORITHM, USED_PROBLEM, writer)
     agent = train(env)
-    torch.save(agent.model.state_dict(), "ppo_final_model"+USED_PROBLEM_NAME+".pth")
+    torch.save(agent.model.state_dict(), FINAL_RUNN_NAME+".pth")
     print("ppo_final_model"+USED_PROBLEM_NAME+".pth")

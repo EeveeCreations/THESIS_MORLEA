@@ -14,11 +14,13 @@ USED_SEED = 42
 ### Main   Dynamic Parameters N#############################################################################
 USED_PROBLEM_NAME= "zdt4"
 
+FINAL_RUNN_NAME= str("ppo_final_model"+USED_PROBLEM_NAME+ "ALL_ETA20")
+USE_ALGORITHM = "MOEA_RL"
 ### EVO ALGO NSGAII ##################
 CROSSOVER_PROBABILITY = 0.9
 MUTATION_PROBABILITY = 0.9
 
-ETA_CROSSOVER = 15
+ETA_CROSSOVER = 20
 ETA_MUTATION = 20
 
 MAX_GENERATIONS=200

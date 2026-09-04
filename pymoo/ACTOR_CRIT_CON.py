@@ -26,7 +26,8 @@ class ActorCritic(nn.Module):
         self.mu = nn.Linear(FILTERS_IN_NN, action_dim)
         self.log_std = nn.Parameter(torch.zeros(action_dim))
 
-        self.value = nn.Linear(128, 1)
+        self.value = nn.Linear(FILTERS_IN_NN
+                               , 1)
 
     def forward(self, state):
         x = self.shared(state)
