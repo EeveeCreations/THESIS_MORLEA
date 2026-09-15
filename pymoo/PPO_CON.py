@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pickle import POP_MARK
 
 import numpy as np
 import torch
@@ -13,6 +14,7 @@ from MOEA_RL import (USED_PROBLEM, USED_ALGORITHM,
                      USED_PROBLEM_NAME, FINAL_RUNN_NAME)
 
 from EA_ENV_CON import EAEnv
+
 
 class PPO:
     def __init__(self, state_dim, action_dim):
@@ -150,12 +152,6 @@ def train(env):
             episode
         )
 
-        writer.add_scalar(
-            "Return/Mean",
-            np.mean(returns),
-            episode
-        )
-
 
         print(f"Episode {episode} | Reward: {total_reward}")
 
@@ -174,4 +170,4 @@ if __name__ == "__main__":
     env = EAEnv(USED_ALGORITHM, USED_PROBLEM, writer)
     agent = train(env)
     torch.save(agent.model.state_dict(), FINAL_RUNN_NAME+".pth")
-    print("ppo_final_model"+USED_PROBLEM_NAME+".pth")
+    print(FINAL_RUNN_NAME + ".pth")

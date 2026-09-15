@@ -1,10 +1,11 @@
 import gymnasium
 from gymnasium import spaces
 import numpy as np
-from MOEA_RL import REWARD_SCALE, REF_POINT
+from MOEA_RL import REWARD_SCALE, REF_POINT,TRUNCATION_CONDITION, MIN_IMPROVEMENT
 from pymoo.indicators.hv import HV
 
 from torch.utils.tensorboard import SummaryWriter
+
 
 
 class EAEnv(gymnasium.Env):
@@ -27,7 +28,7 @@ class EAEnv(gymnasium.Env):
             low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32
         )
 
-        self.truncation_condition =  0.001
+        self.truncation_condition =  TRUNCATION_CONDITION
 
         self.avrg_mutation = np.array([])
         self.avrg_crossover = np.array([])
@@ -47,7 +48,8 @@ class EAEnv(gymnasium.Env):
 
         hv_gain_ratio = (new_hv - self.prev_hv) / max(self.prev_hv, 1e-12)
 
-        if hv_gain_ratio < self.truncation_condition:
+        # UGY TO BE CHANGED BUT  0.2 is   FRO NOW THE  MININUM RIS EBFORE WE TRUNCATE
+        if hv_gain_ratio < MIN_IMPROVEMNET :
 
             self.max_steps  = current_sc ## This way in trucrates early
 
@@ -59,7 +61,7 @@ class EAEnv(gymnasium.Env):
 
 
     def step(self, action):
-        mutation = float(np.clip(action[0], 0.0, 1.0))
+        mutation = float(np.clip(action[0], 0.0, 1.0)) ## Make teh ACtion decide on  th e best next    values
         crossover = float(np.clip(action[1], 0.0, 1.0))
 
         # apply EA params

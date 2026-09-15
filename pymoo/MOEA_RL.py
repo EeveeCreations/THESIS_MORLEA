@@ -10,21 +10,26 @@ from ACTOR_CRIT_CON import ActorCritic
 
 
 ############ Basic  Soltion functiom
-USED_SEED = 42
+USED_SEED = 55 ## 33, 55, 42
 ### Main   Dynamic Parameters N#############################################################################
 USED_PROBLEM_NAME= "zdt4"
-
-FINAL_RUNN_NAME= str("ppo_final_model"+USED_PROBLEM_NAME+ "ALL_ETA20")
 USE_ALGORITHM = "MOEA_RL"
-### EVO ALGO NSGAII ##################
+
+
+### EVO ALGO NSGAII STATICsop[ ##################
 CROSSOVER_PROBABILITY = 0.9
 MUTATION_PROBABILITY = 0.9
 
-ETA_CROSSOVER = 20
-ETA_MUTATION = 20
 
-MAX_GENERATIONS=200
-POP_SIZE =1000
+#ETA is used to control the spread or variation strength in genetic operators
+ETA_CROSSOVER = 15
+ETA_MUTATION = 15
+
+TRUNCATION_CONDITION =  0.001
+MIN_IMPROVEMENT = 0.2
+
+MAX_GENERATIONS = 200
+POP_SIZE = 1000
 
 
 #HYPER VOLUME REFRENCE POINT###############################################################
@@ -32,7 +37,7 @@ REF_POINT = np.array([1.1, 1.1])
 
 
 #######ENVIRONMENT PARAMTERS  ###########################################################
-REWARD_SCALE = 0.5
+REWARD_SCALE = 0.8
 
 #### Parameters RL #######################################################################
 RL_GAMMA = 0.99
@@ -58,6 +63,11 @@ USED_ALGORITHM = NSGA2(
     mutation=PM(eta=ETA_MUTATION, prob=MUTATION_PROBABILITY),
     pop_size=POP_SIZE)
 USED_ALGORITHM.setup(USED_PROBLEM, seed=USED_SEED)
+FINAL_RUNN_NAME= str("ppo_final_model"+USED_PROBLEM_NAME+"_MAX_GENERATIONS"+str(MAX_GENERATIONS)+
+                     "_POP_SIZE"+str(POP_SIZE)+"_ETA_CROSSOVER"+str(ETA_CROSSOVER)+
+                     "_REWARD_SCALE"+ str(REWARD_SCALE)+"_ETA_MUTATION"+str(ETA_MUTATION)+
+                     "_MIN_IMPROVEMENT"+str(MIN_IMPROVEMENT) + "_USED_SEED"+ str(USED_SEED)
+                     )
 
 
 ###################### SINGLE USE FUNCTIONS NOT  USD  FOR  OPTIMIZTING OR  ACTUAL THESIS  RESERACH
@@ -78,7 +88,7 @@ USED_ALGORITHM.setup(USED_PROBLEM, seed=USED_SEED)
 #
 #
 
-
+# 0632683093 ``Light
 # pf = USED_PROBLEM.pareto_front()
 #
 # def plot_pareto_front(ea_algo, rl_algo, problem_name, pareto_front):
