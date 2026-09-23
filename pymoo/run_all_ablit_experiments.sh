@@ -2,7 +2,7 @@
 
 set -e
 
-for script in ./*.sh; do
+for script in .experiments/blitionstudy_scripts/*.sh; do
     echo "========================================"
     echo "Running EVERYTHING: $script"
     echo "========================================"

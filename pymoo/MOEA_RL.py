@@ -16,7 +16,7 @@ USED_SEED = 55 ## 33, 55, 42
 ### Main   Dynamic Parameters N#############################################################################
 USED_PROBLEM_NAME= "zdt6"
 USE_ALGORITHM = "MOEA_RL"
-
+EXPERIMENT_NAME ="NORMAL"  ##  NAME OF AN EXPERIMENT FRO THE MAPPING
 
 ### EVO ALGO NSGAII STATICsop[ ##################
 CROSSOVER_PROBABILITY = 0.5
@@ -64,6 +64,10 @@ OPTIMIZER= optim.Adam
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument("--problem", type=str, default=USED_PROBLEM_NAME)
+
+# parser.add_argument("--seed", type=int, default=USED_SEED)
+
 parser.add_argument("--seed", type=int, default=USED_SEED)
 parser.add_argument("--crossover_probability", type=float, default=CROSSOVER_PROBABILITY)
 parser.add_argument("--mutation_probability", type=float, default=MUTATION_PROBABILITY)
@@ -72,16 +76,21 @@ parser.add_argument("--eta_mutation", type=float, default=ETA_MUTATION)
 
 parser.add_argument("--reward_scale", type=float, default=REWARD_SCALE)
 parser.add_argument("--min_improvement", type=float, default=MIN_IMPROVEMENT)
+parser.add_argument("--truncation_condition", type=str, default=TRUNCATION_CONDITION)
+parser.add_argument("--pop_size", type=int, default=POP_SIZE)
+parser.add_argument("--max_generations", type=int, default=MAX_GENERATIONS)
+
 
 parser.add_argument("--gamma", type=float, default=GAMMA)
-parser.add_argument("--lambda", type=float, default=LAMBDA)
+parser.add_argument("--lambda_", type=float, default=LAMBDA)
 parser.add_argument("--clip", type=float, default=CLIP)
 parser.add_argument("--learning_rate", type=float, default=LEARNING_RATE)
 parser.add_argument("--epochs", type=int, default=EPOCHS)
 parser.add_argument("--entropy_count", type=float, default=ENTHROPHY_COUNT)
+parser.add_argument("--experiment_name", type=str, default=EXPERIMENT_NAME)
 
 
-args, unkown = parser.parse_known_args()
+args,unkown = parser.parse_known_args()
 
 # ============================================================
 # and apply if needed ^w^
@@ -138,8 +147,8 @@ if args.epochs is not None:
 if args.entropy_count is not None:
     ENTHROPHY_COUNT = args.entropy_count
 
-if args.actor_loss is not None:
-    ACTOR_LOSS = args.actor_loss
+if args.experiment_name is not None:
+    EXPERIMENT_NAME = args.experiment_name
 
 ### PROBLEM  / ALGORITHEM USED
 USED_PROBLEM = get_problem(USED_PROBLEM_NAME)

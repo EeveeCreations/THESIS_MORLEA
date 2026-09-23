@@ -11,7 +11,8 @@ from torch.utils.tensorboard import SummaryWriter
 from MOEA_RL import (USED_PROBLEM, USED_ALGORITHM,
                      GAMMA, LAMBDA, CLIP, EPOCHS,
                      LEARNING_RATE, MODEL, OPTIMIZER,
-                     USED_PROBLEM_NAME, FINAL_RUNN_NAME)
+                     USED_PROBLEM_NAME, FINAL_RUNN_NAME
+                     ,EXPERIMENT_NAME)
 
 from EA_ENV_CON import EAEnv
 
@@ -125,6 +126,7 @@ def train(env):
         returns = [a + v for a, v in zip(advantages, values)]
 
         agent.update(states, actions, log_probs, returns, advantages)
+        actions_array = np.array(actions)
 
         total_reward = sum(rewards)
         ## SAFE TO   CSV
@@ -152,6 +154,42 @@ def train(env):
             episode
         )
 
+        ###  EA  PAREMTERSS
+        writer.add_scalar(
+            "EA/MutationProbability",
+            np.mean(actions_array[:, 0]),
+            episode
+        )
+
+        writer.add_scalar(
+            "EA/MutationProbability_Min",
+            np.min(actions_array[:, 0]),
+            episode
+        )
+
+        writer.add_scalar(
+            "EA/MutationProbability_Max",
+            np.max(actions_array[:, 0]),
+            episode
+        )
+        writer.add_scalar(
+            "EA/CrossoverProbability",
+            np.mean(actions_array[:, 1]),
+            episode
+        )
+
+        writer.add_scalar(
+            "EA/CrossoverProbability_Min",
+            np.min(actions_array[:, 1]),
+            episode
+        )
+
+        writer.add_scalar(
+            "EA/CrossoverProbability_Max",
+            np.max(actions_array[:, 1]),
+            episode
+        )
+
 
         print(f"Episode {episode} | Reward: {total_reward}")
 
@@ -161,11 +199,11 @@ def train(env):
 
 if __name__ == "__main__":
     ######## Save the   ALgorithem
-    mapping = "runs/RLMOEA/"+str(USED_PROBLEM_NAME)
+    mapping = "runs/RLMOEA/"+str(USED_PROBLEM_NAME)+"/"+str(EXPERIMENT_NAME)
     date_safer = str(datetime.now().date())
     print(date_safer)
     os.makedirs(mapping, exist_ok=True)
-    writer = SummaryWriter(log_dir=mapping+"/"+date_safer)#
+    writer = SummaryWriter(log_dir=mapping+"/"+date_safer)#safe  experiments run omn teh same day to  com ine easily
 
     env = EAEnv(USED_ALGORITHM, USED_PROBLEM, writer)
     agent = train(env)
