@@ -2,11 +2,11 @@
 
 set -e
 
-for script in .experiments/blitionstudy_scripts/*.sh; do
     echo "========================================"
     echo "Running EVERYTHING: $script"
     echo "========================================"
 
+for script in .experiments/blitionstudy_scripts/*.sh; do
     if bash "$script"; then
         echo "SUCCESS: $script"
     else
