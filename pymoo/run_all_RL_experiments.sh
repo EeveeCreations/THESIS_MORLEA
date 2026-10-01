@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "All experiments completed."ed."
+echo "All experiments completed."
 
 for script in ./experiments/ablitionstudy_scripts/RL/*.sh; do
     echo "========================================"
