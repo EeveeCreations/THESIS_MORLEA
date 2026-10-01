@@ -6,7 +6,7 @@ set -e
     echo "Running EVERYTHING: $script"
     echo "========================================"
 
-for script in .experiments/blitionstudy_scripts/*.sh; do
+for script in .experiments/ablitionstudy_scripts/*.sh; do
     if bash "$script"; then
         echo "SUCCESS: $script"
     else
