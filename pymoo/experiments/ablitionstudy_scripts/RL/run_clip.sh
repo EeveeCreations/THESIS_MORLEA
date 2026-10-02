@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BASE="python ppo_continuous_action_pattern.py"
+BASE="python PPO_CON.py"
 SEEDS=(33 55 42)
 
 TASK="pattern_postition_task"
