@@ -1,4 +1,4 @@
-@echo off
+#!/usr/bin/env bash
 
 echo ========================================
 echo Creating virtual environment...
