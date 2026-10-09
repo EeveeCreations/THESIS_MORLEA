@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from pickle import POP_MARK
 
 import numpy as np
 import torch

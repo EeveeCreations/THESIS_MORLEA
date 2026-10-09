@@ -27,7 +27,10 @@ MUTATION_PROBABILITY = 0.5
 ETA_CROSSOVER = 20
 ETA_MUTATION = 15
 
-TRUNCATION_CONDITION =  0.001
+######    THE TTUNCATION  optionsss!!!!! ############
+MAX_STEPS = 50
+MIN_STEPS = 10
+TRUNCATION_CONDITION =  0.0001
 MIN_IMPROVEMENT = 0.2
 
 MAX_GENERATIONS = 200
@@ -75,6 +78,8 @@ parser.add_argument("--eta_crossover", type=float, default=ETA_CROSSOVER)
 parser.add_argument("--eta_mutation", type=float, default=ETA_MUTATION)
 
 parser.add_argument("--reward_scale", type=float, default=REWARD_SCALE)
+parser.add_argument("--min_steps", type=float, default=MIN_STEPS)
+parser.add_argument("--max_steps", type=str, default=MAX_STEPS)
 parser.add_argument("--min_improvement", type=float, default=MIN_IMPROVEMENT)
 parser.add_argument("--truncation_condition", type=str, default=TRUNCATION_CONDITION)
 parser.add_argument("--pop_size", type=int, default=POP_SIZE)
@@ -113,6 +118,13 @@ if args.eta_crossover is not None:
 
 if args.eta_mutation is not None:
     ETA_MUTATION = args.eta_mutation
+
+
+if args.min_steps is not None:
+    MIN_STEPS = args.min_steps
+
+if args.max_steps is not None:
+    MAX_STEPS = args.max_steps
 
 if args.truncation_condition is not None:
     TRUNCATION_CONDITION = args.truncation_condition
@@ -160,5 +172,6 @@ USED_ALGORITHM.setup(USED_PROBLEM, seed=USED_SEED)
 FINAL_RUNN_NAME = str("ppo_final_model" + USED_PROBLEM_NAME + "_MAX_GENERATIONS" + str(MAX_GENERATIONS) +
                       "_POP_SIZE" + str(POP_SIZE) + "_ETA_CROSSOVER" + str(ETA_CROSSOVER) +
                       "_REWARD_SCALE" + str(REWARD_SCALE) + "_ETA_MUTATION" + str(ETA_MUTATION) +
-                      "_MIN_IMPROVEMENT" + str(MIN_IMPROVEMENT) + "_USED_SEED" + str(USED_SEED)
+                      "_MIN_IMPROVEMENT" + str(MIN_IMPROVEMENT) + "_USED_SEED" + str(USED_SEED) +
+                      "_MIN_STEPS" + str(MIN_STEPS) + "_MAX_STEPS" + str(MAX_STEPS)
                       )

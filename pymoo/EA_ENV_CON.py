@@ -1,11 +1,8 @@
 import gymnasium
 from gymnasium import spaces
 import numpy as np
-from MOEA_RL import REWARD_SCALE, REF_POINT,TRUNCATION_CONDITION, MIN_IMPROVEMENT
+from MOEA_RL import REWARD_SCALE, REF_POINT,TRUNCATION_CONDITION, MIN_IMPROVEMENT, MIN_STEPS , MAX_STEPS
 from pymoo.indicators.hv import HV
-
-from torch.utils.tensorboard import SummaryWriter
-
 
 
 class EAEnv(gymnasium.Env):
@@ -39,18 +36,24 @@ class EAEnv(gymnasium.Env):
         self.last_improvement = 0
         self.state = np.zeros(3, dtype=np.float32)
         self.prev_hv = 0.0
-        self.max_steps = 50 # MAX STEPS   PER EPISODE  MAybe find it to be vribale  epsilon close
+        self.min_steps = MIN_STEPS
+        self.max_steps = MAX_STEPS # MAX STEPS   PER EPISODE  MAybe find it to be vribale  epsilon close
         self.step_count = 0
 
     def decide_max(self, new_hv):
 
         current_sc = self.step_count
+        print("new_hv"+str(new_hv)+
+              "\n prev_hv"+str(self.prev_hv))
 
-        hv_gain_ratio = (new_hv - self.prev_hv) / max(self.prev_hv, 1e-12)
+        hv_gain_ratio = (new_hv - self.prev_hv) / max(self.prev_hv, 1e-1)
 
         # UGY TO BE CHANGED BUT  0.2 is   FRO NOW THE  MININUM RIS EBFORE WE TRUNCATE
-        if hv_gain_ratio < MIN_IMPROVEMNET :
-
+        if hv_gain_ratio < MIN_IMPROVEMENT :
+            # aserrror handling echo th e step it stops at
+            print("STEP IT GETS STOPPED AT " + str(current_sc)+
+                  "\n Improvement" + str(hv_gain_ratio)+
+                  "\n Min improvm" + str(MIN_IMPROVEMENT))
             self.max_steps  = current_sc ## This way in trucrates early
 
 
@@ -76,6 +79,9 @@ class EAEnv(gymnasium.Env):
         hv =  HV(ref_point=REF_POINT)(F)
 
         improvement = (hv - self.prev_hv) * REWARD_SCALE
+        self.step_count += 1
+        if self.step_count >= self.min_steps:  ## OnLy truncrate possibielty if it had soem steps
+            self.decide_max(new_hv=hv)
         self.last_improvement = improvement
         self.prev_hv = hv
 
@@ -83,8 +89,6 @@ class EAEnv(gymnasium.Env):
 
         self.state = np.array([progress, improvement, hv], dtype=np.float32)
 
-        self.step_count += 1
-        # self.decide_max(new_hv=hv)
         terminated = False
         truncated = self.step_count >= self.max_steps
 
@@ -108,5 +112,5 @@ class EAEnv(gymnasium.Env):
 
         self.step_count = 0
         self.state = np.zeros(3, dtype=np.float32)
-
+        self.max_steps = 50
         return self.state, {}
