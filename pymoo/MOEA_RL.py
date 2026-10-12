@@ -21,28 +21,31 @@ EXPERIMENT_NAME ="NORMAL"  ##  NAME OF AN EXPERIMENT FRO THE MAPPING
 ### EVO ALGO NSGAII STATICsop[ ##################
 CROSSOVER_PROBABILITY = 0.5
 MUTATION_PROBABILITY = 0.5
+        #enbel  WHCIH PAREMETERS ARE GETTING USED
+ENABLE_CROSSOVER=True
+ENABLE_MUTATION=True
+EARLY_TERMINATION=True
 
-
-#ETA is used to control the spread or variation strength in genetic operators
+    #ETA is used to control the spread or variation strength in genetic operators
 ETA_CROSSOVER = 20
 ETA_MUTATION = 15
 
-######    THE TTUNCATION  optionsss!!!!! ############
-MAX_STEPS = 50
-MIN_STEPS = 10
-TRUNCATION_CONDITION =  0.0001
-MIN_IMPROVEMENT = 0.2
 
 MAX_GENERATIONS = 200
 POP_SIZE = 1000
 
 
-#HYPER VOLUME REFRENCE POINT###############################################################
+    #HYPER VOLUME REFRENCE POINT###############################################################
 REF_POINT = np.array([1.1, 1.1])
 
 
 #######ENVIRONMENT PARAMTERS  ###########################################################
 REWARD_SCALE = 0.8
+    ######    THE TTUNCATION  optionsss!!!!! ############
+MAX_STEPS = 50
+MIN_STEPS = 10
+TRUNCATION_CONDITION =  0.0001
+MIN_IMPROVEMENT = 0.2
 
 #### Parameters RL #######################################################################
 RL_GAMMA = 0.99
@@ -74,6 +77,9 @@ parser.add_argument("--problem", type=str, default=USED_PROBLEM_NAME)
 parser.add_argument("--seed", type=int, default=USED_SEED)
 parser.add_argument("--crossover_probability", type=float, default=CROSSOVER_PROBABILITY)
 parser.add_argument("--mutation_probability", type=float, default=MUTATION_PROBABILITY)
+parser.add_argument("--enable_mutation", type=int, default=ENABLE_MUTATION)
+parser.add_argument("--enable_crossover", type=int, default=ENABLE_CROSSOVER)
+parser.add_argument("--early_termination", type=int, default=EARLY_TERMINATION)
 parser.add_argument("--eta_crossover", type=float, default=ETA_CROSSOVER)
 parser.add_argument("--eta_mutation", type=float, default=ETA_MUTATION)
 
@@ -118,6 +124,15 @@ if args.eta_crossover is not None:
 
 if args.eta_mutation is not None:
     ETA_MUTATION = args.eta_mutation
+
+if args.early_termination is not None:
+    EARLY_TERMINATION = args.early_termination
+
+if args.enable_mutation is not None:
+    ENABLE_MUTATION = args.enable_mutation
+
+if args.enable_crossover is not None:
+    ENABLE_CROSSOVER = args.enable_crossover
 
 
 if args.min_steps is not None:
@@ -173,5 +188,7 @@ FINAL_RUNN_NAME = str("ppo_final_model" + USED_PROBLEM_NAME + "_MAX_GENERATIONS"
                       "_POP_SIZE" + str(POP_SIZE) + "_ETA_CROSSOVER" + str(ETA_CROSSOVER) +
                       "_REWARD_SCALE" + str(REWARD_SCALE) + "_ETA_MUTATION" + str(ETA_MUTATION) +
                       "_MIN_IMPROVEMENT" + str(MIN_IMPROVEMENT) + "_USED_SEED" + str(USED_SEED) +
-                      "_MIN_STEPS" + str(MIN_STEPS) + "_MAX_STEPS" + str(MAX_STEPS)
+                      "_MIN_STEPS" + str(MIN_STEPS) + "_MAX_STEPS" + str(MAX_STEPS)+
+                      "_EARLY_TERMINATION" + str(EARLY_TERMINATION) + "ENABLE_CROSSOVER" + str(ENABLE_CROSSOVER) + "ENABLE_MUTATION" + str(ENABLE_MUTATION)
+
                       )

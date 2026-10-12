@@ -11,7 +11,7 @@ from MOEA_RL import (USED_PROBLEM, USED_ALGORITHM,
                      GAMMA, LAMBDA, CLIP, EPOCHS,
                      LEARNING_RATE, MODEL, OPTIMIZER,
                      USED_PROBLEM_NAME, FINAL_RUNN_NAME
-                     ,EXPERIMENT_NAME)
+                     ,EXPERIMENT_NAME, EARLY_TERMINATION,ENABLE_MUTATION,ENABLE_CROSSOVER)
 
 from EA_ENV_CON import EAEnv
 
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     os.makedirs(mapping, exist_ok=True)
     writer = SummaryWriter(log_dir=mapping+"/"+date_safer)#safe  experiments run omn teh same day to  com ine easily
 
-    env = EAEnv(USED_ALGORITHM, USED_PROBLEM, writer)
+    env = EAEnv(USED_ALGORITHM, USED_PROBLEM, writer, early_terminate=EARLY_TERMINATION, enable_crossover=ENABLE_CROSSOVER,enable_mutation=ENABLE_MUTATION)
     agent = train(env)
     torch.save(agent.model.state_dict(), FINAL_RUNN_NAME+".pth")
     print(FINAL_RUNN_NAME + ".pth")

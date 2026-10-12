@@ -6,7 +6,7 @@ from pymoo.indicators.hv import HV
 
 
 class EAEnv(gymnasium.Env):
-    def __init__(self, algorithm, problem, writer):
+    def __init__(self, algorithm, problem, writer, early_terminate=True,enable_mutation=True,enable_crossover=True):
         """
 
         :param algorithm: The PPO algorthem deciding on both Crossover and mutation  oparameters
@@ -29,6 +29,10 @@ class EAEnv(gymnasium.Env):
 
         self.avrg_mutation = np.array([])
         self.avrg_crossover = np.array([])
+
+        self.early_terminate = early_terminate
+        self.enable_mutation = enable_mutation
+        self.enable_crossover = enable_crossover
 
         self.algorithm = algorithm
         self.problem = problem
@@ -64,15 +68,21 @@ class EAEnv(gymnasium.Env):
 
 
     def step(self, action):
-        mutation = float(np.clip(action[0], 0.0, 1.0)) ## Make teh ACtion decide on  th e best next    values
-        crossover = float(np.clip(action[1], 0.0, 1.0))
 
-        # apply EA params
-        self.avrg_crossover = np.append(self.avrg_crossover, mutation)
-        self.avrg_mutation = np.append(self.avrg_mutation, crossover)
+        #### ALloow to do both mutationa nd propablity only   to eb adapted   when requested or completly turend off
+        static_crossover =  self.algorithm.mating.crossover.prob
+        sttaic_mutation = self.algorithm.mating.mutation.prob
+        ###### MUTATION
+        if self.enable_mutation:
+            mutation = float(np.clip(action[0], 0.0, 1.0)) ## Make teh ACtion decide on  th e best next    values
+            self.avrg_mutation = np.append(self.avrg_mutation, mutation)
+            self.algorithm.mating.mutation.prob = mutation
 
-        self.algorithm.mating.mutation.prob = mutation
-        self.algorithm.mating.crossover.prob = crossover
+        #### CROSSOVER
+        if self.enable_crossover:
+            crossover = float(np.clip(action[1], 0.0, 1.0))
+            self.avrg_crossover = np.append(self.avrg_crossover, crossover)
+            self.algorithm.mating.crossover.prob = crossover
 
         self.algorithm.next()
         F = self.algorithm.pop.get("F")
@@ -80,7 +90,8 @@ class EAEnv(gymnasium.Env):
 
         improvement = (hv - self.prev_hv) * REWARD_SCALE
         self.step_count += 1
-        if self.step_count >= self.min_steps:  ## OnLy truncrate possibielty if it had soem steps
+
+        if self.early_terminate & self.step_count >= self.min_steps:  ## OnLy truncrate possibielty if it had soem steps
             self.decide_max(new_hv=hv)
         self.last_improvement = improvement
         self.prev_hv = hv
