@@ -92,8 +92,8 @@ parser.add_argument("--pop_size", type=int, default=POP_SIZE)
 parser.add_argument("--max_generations", type=int, default=MAX_GENERATIONS)
 
 
-parser.add_argument("--gamma", type=float, default=GAMMA)
-parser.add_argument("--lambda_", type=float, default=LAMBDA)
+parser.add_argument("--gamma", type=float, default=GAMMA) #Discount
+parser.add_argument("--lambda_", type=float, default=LAMBDA) #GEA
 parser.add_argument("--clip", type=float, default=CLIP)
 parser.add_argument("--learning_rate", type=float, default=LEARNING_RATE)
 parser.add_argument("--epochs", type=int, default=EPOCHS)
