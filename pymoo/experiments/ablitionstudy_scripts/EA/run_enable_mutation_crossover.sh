@@ -3,10 +3,10 @@
 BASE="python PPO_CON.py"
 SEEDS=(33 55 42)
 
-# --- Enable Mutation/ crossover  / early termination ---
-for early_termination in True False; do
-  for enable_mutation in True False; do
-    for enable_crossover in True False; do
+# --- Enable Mutation/ crossover  / early termination ---  We do 1 /0 mostly cuas ei wrote down intergers for the    RMOA env to recieve as booleans can sometiem sretae  problems
+for early_termination in 1 0; do
+  for enable_mutation in 1 0; do
+    for enable_crossover in 1 0; do
       for seed in "${SEEDS[@]}"; do
         $BASE --task "$TASK" \
           --enable_mutation "$enable_mutation" \
