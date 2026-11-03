@@ -1,0 +1,7 @@
+========================================
+Running EVERYTHING: 
+========================================
+bash: .experiments/ablitionstudy_scripts/*.sh: No such file or directory
+FAILED: .experiments/ablitionstudy_scripts/*.sh
+
+All experiments complet
